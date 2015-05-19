@@ -42,7 +42,7 @@ class CIDR extends \Phalcon\Mvc\Model
     public static function checkIP($ip)
     {
         $ip = ip2long($ip);
-        
+
         return static::count([
                     "first <= ?0 AND last >= ?1",
                     "bind" => [$ip, $ip]
@@ -64,19 +64,20 @@ class CIDR extends \Phalcon\Mvc\Model
         $CIDR->label = $label;
         return $CIDR;
     }
-    
+
     /**
-     * 
+     * Create record from single IP
      * @param string $ip
      * @param string $label
      * @return CIDR
      * @throws \InvalidArgumentException
      */
-    public static function createFromIP($ip, $label = null) {
-        if(\filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) === false) {
+    public static function createFromIP($ip, $label = null)
+    {
+        if (\filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) === false) {
             throw new \InvalidArgumentException("Not valid IP");
         }
-        
+
         return self::createFromCIDR("$ip/32", $label);
     }
 
@@ -92,7 +93,7 @@ class CIDR extends \Phalcon\Mvc\Model
         $first_bin = \str_pad(\decbin($first), 32, "0", \STR_PAD_LEFT);
         $netmask_bin = \str_pad(\str_repeat("1", (int) $netmask), 32, "0", \STR_PAD_RIGHT);
         $last_bin = '';
-        
+
         for ($i = 0; $i < 32; $i++) {
             if ($netmask_bin[$i] === "1") {
                 $last_bin .= $first_bin[$i];
