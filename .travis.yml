@@ -1,0 +1,17 @@
+language: php
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+env:
+  - PHALCON_VERSION="2.0.x"
+services:
+  - redis-server
+  - mysql
+before_script:
+  - mysql -e 'create database phalcon_blacklist;' -uroot
+  - mysql -e "GRANT ALL PRIVILEGES ON phalcon_blacklist.* TO 'phalcon_blacklist'@'localhost' IDENTIFIED BY '';" -uroot
+  - ./travis/install-php-extension.sh ${PHALCON_VERSION}
+  - phpenv config-add travis/php.ini
+  - composer install
+script: cd tests && phpunit --configuration phpunit.xml --coverage-text ./

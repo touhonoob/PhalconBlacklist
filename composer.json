@@ -1,0 +1,36 @@
+{
+    "name": "touhonoob/phalcon-blacklist",
+    "version": "1.0.0",
+    "type": "library",
+    "require": {
+        "ext-phalcon": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.6.6",
+        "fzaninotto/faker": "v1.4.0",
+        "phalcon/devtools": "2.0.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "touhonoob",
+            "email": "touhonoob@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PhalconBlacklist\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhalconBlacklist\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "mkdir .phalcon",
+            "./vendor/bin/phalcon.php migration run --config=configs.php --migrations=migrations --version=1.0.0"
+        ]
+    }
+}
