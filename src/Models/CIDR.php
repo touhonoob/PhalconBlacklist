@@ -25,13 +25,38 @@ class CIDR extends \Phalcon\Mvc\Model
     public $last;
 
     /**
+     * @var int
+     */
+    public $mask;
+
+    /**
      * @var string
      */
     public $label;
 
+    /**
+     * @var string
+     */
+    public $created_at;
+
+    /**
+     * @var int
+     */
+    public $expire_timestamp;
+
     public function getSource()
     {
         return 'blacklist_cidr';
+    }
+
+    public function initialize()
+    {
+        $this->addBehavior(new \Phalcon\Mvc\Model\Behavior\Timestampable([
+            'beforeValidationOnCreate' => [
+                'field' => 'created_at',
+                'format' => 'Y-m-d H:i:s'
+            ]
+        ]));
     }
 
     /**
@@ -45,8 +70,21 @@ class CIDR extends \Phalcon\Mvc\Model
 
         return static::count([
                     "first <= ?0 AND last >= ?1",
-                    "bind" => [$ip, $ip]
+                    "bind" => [$ip, $ip],
+                    "limit" => 1
                 ]) > 0;
+    }
+
+    /**
+     * Remove expired records
+     * @return boolean
+     */
+    public static function garbageCollection()
+    {
+        return static::find([
+                    "expire_timestamp < ?0",
+                    "bind" => [time()]
+                ])->delete();
     }
 
     /**
@@ -61,6 +99,7 @@ class CIDR extends \Phalcon\Mvc\Model
         $CIDR = new CIDR();
         $CIDR->first = $parts['ip'];
         $CIDR->last = static::calculateLast($parts['ip'], $parts['broadcast']);
+        $CIDR->mask = $parts['broadcast'];
         $CIDR->label = $label;
         return $CIDR;
     }
@@ -78,7 +117,12 @@ class CIDR extends \Phalcon\Mvc\Model
             throw new \InvalidArgumentException("Not valid IP");
         }
 
-        return self::createFromCIDR("$ip/32", $label);
+        $CIDR = new CIDR();
+        $CIDR->first = ip2long($ip);
+        $CIDR->last = $CIDR->first;
+        $CIDR->mask = 32;
+        $CIDR->label = $label;
+        return $CIDR;
     }
 
     /**

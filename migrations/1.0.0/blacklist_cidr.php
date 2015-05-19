@@ -46,16 +46,46 @@ class BlacklistCidrMigration_100 extends Migration
                     )
                 ),
                 new Column(
+                    'mask',
+                    array(
+                        'type' => Column::TYPE_INTEGER,
+                        'unsigned' => true,
+                        'notNull' => true,
+                        'size' => 10,
+                        'after' => 'last'
+                    )
+                ),
+                new Column(
                     'label',
                     array(
                         'type' => Column::TYPE_TEXT,
                         'size' => 1,
-                        'after' => 'last'
+                        'after' => 'mask'
+                    )
+                ),
+                new Column(
+                    'created_at',
+                    array(
+                        'type' => Column::TYPE_DATETIME,
+                        'notNull' => true,
+                        'size' => 1,
+                        'after' => 'label'
+                    )
+                ),
+                new Column(
+                    'expire_timestamp',
+                    array(
+                        'type' => Column::TYPE_INTEGER,
+                        'unsigned' => true,
+                        'size' => 10,
+                        'after' => 'created_at'
                     )
                 )
             ),
             'indexes' => array(
-                new Index('PRIMARY', array('id'))
+                new Index('PRIMARY', array('id')),
+                new Index('first_last', array('first', 'last')),
+                new Index('expire_timestamp', array('expire_timestamp'))
             ),
             'options' => array(
                 'TABLE_TYPE' => 'BASE TABLE',

@@ -19,7 +19,7 @@ class CIDRTest extends \PHPUnit_Framework_TestCase
         $di['db']->query("DELETE FROM `{$table}` WHERE 1;");
         $di['db']->query("ALTER TABLE `{$table}` AUTO_INCREMENT = 1;");
     }
-    
+
     public function testValidateCIDR()
     {
         $this->validateParts(CIDR::validateCIDR("168.143.113.0/32"));
@@ -61,7 +61,7 @@ class CIDRTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ip2long("168.143.113.0"), $cidr->first);
         $this->assertEquals(ip2long("168.143.255.255"), $cidr->last);
     }
-    
+
     public function testCreateFromIP()
     {
         $faker = \Faker\Factory::create();
@@ -70,22 +70,34 @@ class CIDRTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ip2long($ip), $cidr->first);
         $this->assertEquals(ip2long($ip), $cidr->last);
     }
-    
 
     public function testCheckIP()
+    {
+        $cidr = $this->randCIDR();
+        for ($i = $cidr->first; $i <= $cidr->last; $i++) {
+            $ip = long2ip($i);
+            $this->assertTrue(CIDR::checkIP($ip));
+        }
+    }
+
+    public function testGarbageCollection()
+    {
+        $cidr = $this->randCIDR();
+        $cidr->expire_timestamp = time() - 10;
+        $cidr->update();
+        CIDR::garbageCollection();
+        $this->assertFalse(CIDR::findFirst($cidr->id));
+    }
+
+    private function randCIDR()
     {
         $faker = \Faker\Factory::create();
         $mask = rand(24, 32);
         $ip = $faker->ipv4;
-        
+
         $cidr = CIDR::createFromCIDR("$ip/$mask");
-        $cidr->save();
-        
-        $first = ip2long($ip);
-        $last = CIDR::calculateLast($first, $mask);
-        
-        for($i = $first;$i <= $last;$i++) {
-            $this->assertTrue(CIDR::checkIP(long2ip($i)));
-        }
+        $cidr->create();
+
+        return $cidr;
     }
 }

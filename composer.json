@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "type": "library",
     "require": {
+        "ext-redis": "^2.2",
         "ext-phalcon": "^2.0"
     },
     "require-dev": {
