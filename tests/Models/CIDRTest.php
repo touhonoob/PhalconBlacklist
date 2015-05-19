@@ -61,6 +61,16 @@ class CIDRTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ip2long("168.143.113.0"), $cidr->first);
         $this->assertEquals(ip2long("168.143.255.255"), $cidr->last);
     }
+    
+    public function testCreateFromIP()
+    {
+        $faker = \Faker\Factory::create();
+        $ip = $faker->ipv4;
+        $cidr = CIDR::createFromIP($ip);
+        $this->assertEquals(ip2long($ip), $cidr->first);
+        $this->assertEquals(ip2long($ip), $cidr->last);
+    }
+    
 
     public function testCheckIP()
     {

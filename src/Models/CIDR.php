@@ -64,6 +64,21 @@ class CIDR extends \Phalcon\Mvc\Model
         $CIDR->label = $label;
         return $CIDR;
     }
+    
+    /**
+     * 
+     * @param string $ip
+     * @param string $label
+     * @return CIDR
+     * @throws \InvalidArgumentException
+     */
+    public static function createFromIP($ip, $label = null) {
+        if(\filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) === false) {
+            throw new \InvalidArgumentException("Not valid IP");
+        }
+        
+        return self::createFromCIDR("$ip/32", $label);
+    }
 
     /**
      * Calculate last IP from first IP & netmask
