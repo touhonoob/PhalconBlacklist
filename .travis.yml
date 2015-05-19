@@ -9,8 +9,8 @@ services:
   - redis-server
   - mysql
 before_script:
-  - mysql -e 'create database phalcon_blacklist;' -uroot
-  - mysql -e "GRANT ALL PRIVILEGES ON phalcon_blacklist.* TO 'phalcon_blacklist'@'localhost' IDENTIFIED BY '';" -uroot
+  - mysql -e 'create database ph_blacklist;' -uroot
+  - mysql -e "GRANT ALL PRIVILEGES ON ph_blacklist.* TO 'ph_blacklist'@'localhost' IDENTIFIED BY '';" -uroot
   - ./travis/install-php-extension.sh ${PHALCON_VERSION}
   - phpenv config-add travis/php.ini
   - composer install
