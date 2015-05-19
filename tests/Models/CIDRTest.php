@@ -89,6 +89,13 @@ class CIDRTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(CIDR::findFirst($cidr->id));
     }
 
+    public function testRemove()
+    {
+        $cidr = $this->randCIDR();
+        CIDR::remove($cidr->id);
+        $this->assertFalse(CIDR::findFirst($cidr->id));
+    }
+
     private function randCIDR()
     {
         $faker = \Faker\Factory::create();

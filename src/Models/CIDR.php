@@ -69,8 +69,8 @@ class CIDR extends \Phalcon\Mvc\Model
         $ip = ip2long($ip);
 
         return static::count([
-                    "first <= ?0 AND last >= ?1",
-                    "bind" => [$ip, $ip],
+                    "first <= ?0 AND last >= ?1 AND (expire_timestamp IS NULL OR expire_timestamp >= ?2)",
+                    "bind" => [$ip, $ip, time()],
                     "limit" => 1
                 ]) > 0;
     }
@@ -113,9 +113,7 @@ class CIDR extends \Phalcon\Mvc\Model
      */
     public static function createFromIP($ip, $label = null)
     {
-        if (\filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) === false) {
-            throw new \InvalidArgumentException("Not valid IP");
-        }
+        self::validateIP($ip);
 
         $CIDR = new CIDR();
         $CIDR->first = ip2long($ip);
@@ -123,6 +121,16 @@ class CIDR extends \Phalcon\Mvc\Model
         $CIDR->mask = 32;
         $CIDR->label = $label;
         return $CIDR;
+    }
+
+    public static function remove($id)
+    {
+        $cidr = self::findFirst($id);
+        if ($cidr === false) {
+            return false;
+        }
+
+        return $cidr->delete();
     }
 
     /**
@@ -177,5 +185,16 @@ class CIDR extends \Phalcon\Mvc\Model
             'ip' => ip2long($ip),
             'broadcast' => $broadcast
         ];
+    }
+
+    /**
+     * @param string $ip
+     * @throws \InvalidArgumentException
+     */
+    private static function validateIP($ip)
+    {
+        if (\filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4) === false) {
+            throw new \InvalidArgumentException("Not valid IP");
+        }
     }
 }
