@@ -3,7 +3,7 @@
 # PhalconBlacklist
 PHP IP/CIDR Blacklist Library Built With Phalcon + MySQL
 
-# Install
+## Install
 ```
 composer require touhonoob/phalcon-blacklist
 ```
